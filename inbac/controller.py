@@ -262,41 +262,28 @@ class Controller():
         return tuple(selection_box)
 
     @staticmethod
-    def get_selected_box(mouse_press_coord: Tuple[int,
-                                                  int],
-                         mouse_move_coord: Tuple[int,
-                                                 int],
-                         aspect_ratio: Optional[Tuple[int,
-                                                      int]]) -> Tuple[int,
-                                                                      int,
-                                                                      int,
-                                                                      int]:
-        selection_top_left_x: int = min(
-            mouse_press_coord[0], mouse_move_coord[0])
-        selection_top_left_y: int = min(
-            mouse_press_coord[1], mouse_move_coord[1])
-        selection_bottom_right_x: int = max(
-            mouse_press_coord[0], mouse_move_coord[0])
-        selection_bottom_right_y: int = max(
-            mouse_press_coord[1], mouse_move_coord[1])
-        selection_box: Tuple[int,
-                             int,
-                             int,
-                             int] = (selection_top_left_x,
-                                     selection_top_left_y,
-                                     selection_bottom_right_x,
-                                     selection_bottom_right_y)
+    def get_selected_box(mouse_press_coord: Tuple[int, int],
+                        mouse_move_coord: Tuple[int, int],
+                        aspect_ratio: Optional[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+        dynamic_width = abs(mouse_move_coord[0] - mouse_press_coord[0]) * 2
+        dynamic_height = abs(mouse_move_coord[1] - mouse_press_coord[1]) * 2
 
         if aspect_ratio is not None:
-            aspect_ratio: float = float(
-                aspect_ratio[0]) / float(aspect_ratio[1])
-            try:
-                selection_box: Tuple[int, int, int, int] = Controller.get_selection_box_for_aspect_ratio(
-                    selection_box, aspect_ratio, mouse_press_coord, mouse_move_coord)
-            except ZeroDivisionError:
-                pass
+            desired_aspect_ratio = aspect_ratio[0] / aspect_ratio[1]
+            dynamic_aspect_ratio = dynamic_width / dynamic_height
+            
+            if dynamic_aspect_ratio > desired_aspect_ratio:
+                dynamic_width = dynamic_height * desired_aspect_ratio
+            else:
+                dynamic_height = dynamic_width / desired_aspect_ratio
 
-        return selection_box
+        selection_top_left_x = mouse_press_coord[0] - dynamic_width / 2
+        selection_top_left_y = mouse_press_coord[1] - dynamic_height / 2
+        selection_bottom_right_x = mouse_press_coord[0] + dynamic_width / 2
+        selection_bottom_right_y = mouse_press_coord[1] + dynamic_height / 2
+
+        return (int(selection_top_left_x), int(selection_top_left_y),
+                int(selection_bottom_right_x), int(selection_bottom_right_y))
 
     @staticmethod
     def get_real_box(selected_box: Tuple[int,
