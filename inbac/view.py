@@ -4,6 +4,7 @@ from tkinter import Tk, Frame, Canvas, Event, Menu, messagebox, filedialog, Topl
 from typing import Tuple, Any
 from PIL.ImageTk import PhotoImage
 import inbac
+import locale
 
 
 class View():
@@ -22,7 +23,12 @@ class View():
         self.create_menu()
 
     def bind_events(self):
-        self.master.bind('z', self.save_next)
+        save_next_key = 'z'
+        loc = locale.getdefaultlocale()
+        if loc[0]:
+            if 'de' in loc[0]:
+                save_next_key = 'y'
+        self.master.bind(save_next_key, self.save_next)
         self.master.bind('x', self.save)
         self.master.bind('c', self.rotate_image)
         self.master.bind('r', self.rotate_aspect_ratio)
