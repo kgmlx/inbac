@@ -162,12 +162,14 @@ class Controller():
             new_filename, _ = os.path.splitext(new_filename)
         if not os.path.exists(self.model.args.output_dir):
             self.create_output_directory()
+        exif_data = self.model.current_image.info.get('exif', b'')
         saved_image.save(
             os.path.join(
                 self.model.args.output_dir,
                 new_filename),
             self.model.args.image_format,
-            quality=self.model.args.image_quality)
+            quality=self.model.args.image_quality,
+            exif=exif_data)
         self.clear_selection_box()
         return True
 
